@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { io } from 'socket.io-client';
 import {
   addTaskOptimistic,
@@ -11,6 +11,21 @@ const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
 export const useSocket = () => {
   const dispatch = useDispatch();
+  const { user } = useSelector((state) => state.auth);
+
+  // Check if current user should see this task
+  const shouldViewTask = (task) => {
+    if (!user) return false;
+    
+    // Admin can see all tasks
+    if (user.role === 'admin') return true;
+    
+    // User can see tasks they created or are assigned to
+    const createdByCurrentUser = task.createdBy?._id === user.id || task.createdBy === user.id;
+    const assignedToCurrentUser = task.assignedTo?._id === user.id || task.assignedTo === user.id;
+    
+    return createdByCurrentUser || assignedToCurrentUser;
+  };
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -33,12 +48,16 @@ export const useSocket = () => {
     // Listen for task events
     socket.on('task:created', (task) => {
       console.log('Task created:', task);
-      dispatch(addTaskOptimistic(task));
+      if (shouldViewTask(task)) {
+        dispatch(addTaskOptimistic(task));
+      }
     });
 
     socket.on('task:updated', (task) => {
       console.log('Task updated:', task);
-      dispatch(updateTaskOptimistic(task));
+      if (shouldViewTask(task)) {
+        dispatch(updateTaskOptimistic(task));
+      }
     });
 
     socket.on('task:deleted', (data) => {
@@ -49,5 +68,5 @@ export const useSocket = () => {
     return () => {
       socket.disconnect();
     };
-  }, [dispatch]);
+  }, [dispatch, user]);
 };

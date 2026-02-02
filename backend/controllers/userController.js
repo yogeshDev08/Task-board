@@ -73,3 +73,29 @@ exports.createUser = async (req, res, next) => {
     next(error);
   }
 };
+
+// Search users (excluding admin) - for assigning tasks
+exports.searchUsers = async (req, res, next) => {
+  try {
+    const { query = '' } = req.query;
+
+    // Build search query - exclude admin users, search by email
+    const searchQuery = {
+      role: { $ne: 'admin' },
+      email: { $regex: query, $options: 'i' }
+    };
+
+    const users = await User.find(searchQuery)
+      .select('_id email')
+      .limit(10)
+      .sort({ email: 1 });
+
+    res.json({
+      success: true,
+      count: users.length,
+      data: { users }
+    });
+  } catch (error) {
+    next(error);
+  }
+};

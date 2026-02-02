@@ -99,6 +99,11 @@ exports.createTask = async (req, res, next) => {
       createdBy: req.user._id
     };
 
+    // Convert empty string to null for assignedTo
+    if (taskData.assignedTo === '') {
+      taskData.assignedTo = null;
+    }
+
     const task = await Task.create(taskData);
     const populatedTask = await Task.findById(task._id)
       .populate('assignedTo', 'email')

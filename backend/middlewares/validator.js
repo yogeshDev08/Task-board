@@ -81,7 +81,7 @@ exports.validateCreateTask = [
     .isISO8601()
     .withMessage('Due date must be a valid date'),
   body('assignedTo')
-    .optional()
+    .optional({ checkFalsy: true })
     .isMongoId()
     .withMessage('AssignedTo must be a valid user ID'),
   handleValidationErrors
@@ -113,7 +113,7 @@ exports.validateUpdateTask = [
     .isISO8601()
     .withMessage('Due date must be a valid date'),
   body('assignedTo')
-    .optional()
+    .optional({ checkFalsy: true })
     .isMongoId()
     .withMessage('AssignedTo must be a valid user ID'),
   handleValidationErrors

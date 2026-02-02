@@ -12,7 +12,7 @@ import Profile from './pages/Profile';
 import Layout from './components/Layout';
 
 function App() {
-  // Initialize WebSocket connection
+
   useSocket();
 
   return (
