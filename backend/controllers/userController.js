@@ -1,7 +1,6 @@
 const User = require('../models/User');
 const { AppError } = require('../middlewares/errorHandler');
 
-// Get all users (admin only)
 exports.getAllUsers = async (req, res, next) => {
   try {
     const users = await User.find().select('-password').sort({ createdAt: -1 });
@@ -16,7 +15,6 @@ exports.getAllUsers = async (req, res, next) => {
   }
 };
 
-// Get user by ID
 exports.getUserById = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id).select('-password');
@@ -37,7 +35,6 @@ exports.getUserById = async (req, res, next) => {
   }
 };
 
-// Create user (admin only)
 exports.createUser = async (req, res, next) => {
   try {
     const { email, password, role } = req.body;
@@ -74,7 +71,6 @@ exports.createUser = async (req, res, next) => {
   }
 };
 
-// Search users (excluding admin) - for assigning tasks
 exports.searchUsers = async (req, res, next) => {
   try {
     const { query = '' } = req.query;

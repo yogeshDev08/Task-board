@@ -13,7 +13,6 @@ export const useSocket = () => {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
-  // Check if current user should see this task
   const shouldViewTask = (task) => {
     if (!user) return false;
     

@@ -10,7 +10,6 @@ const SearchableUserSelect = ({ value, onChange, label = 'Assign To' }) => {
   const [loading, setLoading] = useState(false);
   const containerRef = useRef(null);
 
-  // Debounced search function
   const debouncedSearch = useCallback(
     debounce(async (query) => {
       if (!query.trim()) {

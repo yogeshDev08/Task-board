@@ -3,15 +3,18 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { useSocket } from './hooks/useSocket';
+import { useSelector } from 'react-redux';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard';
 import TaskList from './pages/TaskList';
 import Profile from './pages/Profile';
 import Layout from './components/Layout';
 
 function App() {
+  const { user } = useSelector((state) => state.auth);
 
   useSocket();
 
@@ -29,7 +32,7 @@ function App() {
           }
         >
           <Route index element={<Navigate to="/dashboard" replace />} />
-          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="dashboard" element={user?.role === 'admin' ? <AdminDashboard /> : <Dashboard />} />
           <Route path="tasks" element={<TaskList />} />
           <Route path="profile" element={<Profile />} />
         </Route>

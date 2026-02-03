@@ -2,14 +2,12 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const { AppError } = require('../middlewares/errorHandler');
 
-// Generate JWT token
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN || '1h'
   });
 };
 
-// Register new user
 exports.register = async (req, res, next) => {
   try {
     const { email, password, role } = req.body;
@@ -23,14 +21,12 @@ exports.register = async (req, res, next) => {
       });
     }
 
-    // Create user
     const user = await User.create({
       email,
       password,
       role: role || 'user'
     });
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.status(201).json({
@@ -50,7 +46,6 @@ exports.register = async (req, res, next) => {
   }
 };
 
-// Login user
 exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
@@ -64,7 +59,6 @@ exports.login = async (req, res, next) => {
       });
     }
 
-    // Check password
     const isPasswordValid = await user.comparePassword(password);
     if (!isPasswordValid) {
       return res.status(401).json({
@@ -73,7 +67,6 @@ exports.login = async (req, res, next) => {
       });
     }
 
-    // Generate token
     const token = generateToken(user._id);
 
     res.json({
@@ -93,7 +86,6 @@ exports.login = async (req, res, next) => {
   }
 };
 
-// Get current user
 exports.getMe = async (req, res, next) => {
   try {
     const user = await User.findById(req.user._id);

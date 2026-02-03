@@ -6,8 +6,6 @@ const ProtectedRoute = ({ children }) => {
   const { isAuthenticated } = useSelector((state) => state.auth);
   const token = localStorage.getItem('token');
 
-  // Check if user has token in localStorage (persisted authentication)
-  // or if Redux state indicates authentication
   const hasValidAuth = isAuthenticated || !!token;
 
   if (!hasValidAuth) {
