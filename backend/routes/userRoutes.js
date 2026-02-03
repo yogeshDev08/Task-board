@@ -7,6 +7,9 @@ const { validateCreateUser } = require('../middlewares/validator');
 // All routes require authentication
 router.use(authenticate);
 
+// Search users (non-admin) for assigning tasks
+router.get('/search', userController.searchUsers);
+
 // Admin-only routes
 router.get('/', authorizeAdmin, userController.getAllUsers);
 router.post('/', authorizeAdmin, validateCreateUser, userController.createUser);

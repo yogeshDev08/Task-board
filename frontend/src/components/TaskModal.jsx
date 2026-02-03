@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { createTask, updateTask } from '../store/tasksSlice';
 import FormInput from './FormInput';
+import SearchableUserSelect from './SearchableUserSelect';
 import LoadingSpinner from './LoadingSpinner';
 
 const TaskModal = ({ task, isOpen, onClose }) => {
@@ -16,7 +17,8 @@ const TaskModal = ({ task, isOpen, onClose }) => {
     handleSubmit,
     formState: { errors },
     reset,
-    setValue
+    setValue,
+    watch
   } = useForm({
     defaultValues: {
       title: '',
@@ -25,8 +27,11 @@ const TaskModal = ({ task, isOpen, onClose }) => {
       priority: 'MEDIUM',
       dueDate: '',
       assignedTo: ''
-    }
+    },
+    mode: 'onBlur'
   });
+
+  const assignedToValue = watch('assignedTo');
 
   useEffect(() => {
     if (task) {
@@ -78,6 +83,11 @@ const TaskModal = ({ task, isOpen, onClose }) => {
             errors={errors}
             required
             placeholder="Enter task title"
+            validation={{
+              required: 'Title is required',
+              minLength: { value: 3, message: 'Title must be at least 3 characters' },
+              maxLength: { value: 200, message: 'Title cannot exceed 200 characters' }
+            }}
           />
 
           <div className="mb-4">
@@ -86,11 +96,18 @@ const TaskModal = ({ task, isOpen, onClose }) => {
             </label>
             <textarea
               id="description"
-              {...register('description')}
+              {...register('description', {
+                maxLength: { value: 1000, message: 'Description cannot exceed 1000 characters' }
+              })}
               rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.description ? 'border-red-500' : 'border-gray-300'
+              }`}
               placeholder="Enter task description"
             />
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+            )}
           </div>
 
           <div className="mb-4">
@@ -123,27 +140,40 @@ const TaskModal = ({ task, isOpen, onClose }) => {
             </select>
           </div>
 
-          <FormInput
-            label="Due Date"
-            type="date"
-            name="dueDate"
-            register={register}
-            errors={errors}
-          />
+          <div className="mb-4">
+            <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-1">
+              Due Date <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="date"
+              id="dueDate"
+              {...register('dueDate', {
+                required: 'Due date is required',
+                validate: {
+                  futureDate: (value) => {
+                    if (!value) return true; // Will be caught by required validation
+                    const selectedDate = new Date(value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    return selectedDate >= today || 'Due date must be today or in the future';
+                  }
+                }
+              })}
+              className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                errors.dueDate ? 'border-red-500' : 'border-gray-300'
+              }`}
+            />
+            {errors.dueDate && (
+              <p className="text-red-500 text-sm mt-1">{errors.dueDate.message}</p>
+            )}
+          </div>
 
           {user?.role === 'admin' && (
-            <div className="mb-4">
-              <label htmlFor="assignedTo" className="block text-sm font-medium text-gray-700 mb-1">
-                Assign To (User ID)
-              </label>
-              <input
-                type="text"
-                id="assignedTo"
-                {...register('assignedTo')}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                placeholder="User ID (optional)"
-              />
-            </div>
+            <SearchableUserSelect
+              value={assignedToValue}
+              onChange={(value) => setValue('assignedTo', value)}
+              label="Assign To"
+            />
           )}
 
           <div className="flex gap-3 mt-6">

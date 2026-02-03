@@ -27,7 +27,8 @@ const taskSchema = new mongoose.Schema({
   },
   assignedTo: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User'
+    ref: 'User',
+    default: null
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
@@ -39,12 +40,12 @@ const taskSchema = new mongoose.Schema({
 });
 
 // Indexes for performance
-taskSchema.index({ title: 'text' }); // Text search
+taskSchema.index({ title: 'text' });
 taskSchema.index({ status: 1 });
 taskSchema.index({ priority: 1 });
 taskSchema.index({ dueDate: 1 });
 taskSchema.index({ assignedTo: 1 });
 taskSchema.index({ createdBy: 1 });
-taskSchema.index({ status: 1, priority: 1 }); // Compound index for common queries
+taskSchema.index({ status: 1, priority: 1 });
 
 module.exports = mongoose.model('Task', taskSchema);

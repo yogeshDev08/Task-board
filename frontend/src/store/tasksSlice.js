@@ -1,7 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../utils/api';
 
-// Async thunks
 export const fetchTasks = createAsyncThunk(
   'tasks/fetchTasks',
   async (params = {}, { rejectWithValue }) => {
@@ -73,7 +72,6 @@ export const deleteTask = createAsyncThunk(
   }
 );
 
-// Initial state
 const initialState = {
   tasks: [],
   currentTask: null,
@@ -93,7 +91,6 @@ const initialState = {
   error: null
 };
 
-// Tasks slice
 const tasksSlice = createSlice({
   name: 'tasks',
   initialState,
@@ -156,7 +153,6 @@ const tasksSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch tasks
       .addCase(fetchTasks.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -170,7 +166,6 @@ const tasksSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Fetch task by ID
       .addCase(fetchTaskById.pending, (state) => {
         state.loading = true;
       })
@@ -182,7 +177,6 @@ const tasksSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Create task
       .addCase(createTask.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -196,7 +190,6 @@ const tasksSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Update task
       .addCase(updateTask.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -215,7 +208,6 @@ const tasksSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-      // Delete task
       .addCase(deleteTask.pending, (state) => {
         state.loading = true;
         state.error = null;

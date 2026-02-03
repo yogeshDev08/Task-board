@@ -1,16 +1,13 @@
 const Task = require('../models/Task');
 const { AppError } = require('../middlewares/errorHandler');
 
-// Get all tasks with pagination, filtering, and search
 exports.getAllTasks = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, status, priority, search, dueDate } = req.query;
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Build query
     const query = {};
 
-    // Build base filters
     const filters = {};
     if (status) filters.status = status;
     if (priority) filters.priority = priority;
@@ -58,7 +55,6 @@ exports.getAllTasks = async (req, res, next) => {
   }
 };
 
-// Get task by ID
 exports.getTaskById = async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id)
@@ -99,6 +95,11 @@ exports.createTask = async (req, res, next) => {
       createdBy: req.user._id
     };
 
+    // Convert empty string to null for assignedTo
+    if (taskData.assignedTo === '') {
+      taskData.assignedTo = null;
+    }
+
     const task = await Task.create(taskData);
     const populatedTask = await Task.findById(task._id)
       .populate('assignedTo', 'email')
@@ -117,7 +118,6 @@ exports.createTask = async (req, res, next) => {
   }
 };
 
-// Update task
 exports.updateTask = async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id);
@@ -165,7 +165,6 @@ exports.updateTask = async (req, res, next) => {
   }
 };
 
-// Delete task
 exports.deleteTask = async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id);

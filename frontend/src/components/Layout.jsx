@@ -1,17 +1,20 @@
 import React from 'react';
-import { Outlet, Link, useNavigate } from 'react-router-dom';
+import { Outlet, Link, useNavigate, useMatch } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/authSlice';
 
 const Layout = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   const { user } = useSelector((state) => state.auth);
 
   const handleLogout = () => {
     dispatch(logout());
     navigate('/login');
   };
+
+  const isActive = (path) => { return useMatch({ path, end: true }) !== null; };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -25,19 +28,19 @@ const Layout = () => {
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 <Link
                   to="/dashboard"
-                  className="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  className={`${isActive("/dashboard") ? "border-blue-500" : "border-transparent hover:border-gray-300 hover:text-gray-700"}   text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                 >
                   Dashboard
                 </Link>
                 <Link
                   to="/tasks"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  className={`${isActive("/tasks") ? "border-blue-500" : "border-transparent hover:border-gray-300 hover:text-gray-700"} text-gray-500 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                 >
                   Tasks
                 </Link>
                 <Link
                   to="/profile"
-                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  className={`${isActive("/profile") ? "border-blue-500" : "border-transparent hover:border-gray-300 hover:text-gray-700"} text-gray-500 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
                 >
                   Profile
                 </Link>

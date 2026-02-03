@@ -65,6 +65,13 @@ const Register = () => {
               errors={errors}
               required
               placeholder="Email address"
+              validation={{
+                required: 'Email is required',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                  message: 'Invalid email address'
+                }
+              }}
             />
             <FormInput
               label="Password"
@@ -74,6 +81,21 @@ const Register = () => {
               errors={errors}
               required
               placeholder="Password (min 6 characters)"
+              validation={{
+                required: 'Password is required',
+                minLength: {
+                  value: 6,
+                  message: 'Password must be at least 6 characters'
+                },
+                validate: {
+                  hasUpperCase: (value) =>
+                    /[A-Z]/.test(value) || 'Password must contain at least one uppercase letter',
+                  hasLowerCase: (value) =>
+                    /[a-z]/.test(value) || 'Password must contain at least one lowercase letter',
+                  hasNumber: (value) =>
+                    /\d/.test(value) || 'Password must contain at least one number'
+                }
+              }}
             />
             <div className="mb-4">
               <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-1">

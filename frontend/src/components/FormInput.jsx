@@ -8,6 +8,7 @@ const FormInput = ({
   errors, 
   placeholder,
   required = false,
+  validation = {},
   ...props 
 }) => {
   return (
@@ -18,7 +19,10 @@ const FormInput = ({
       <input
         type={type}
         id={name}
-        {...register(name, { required: required && `${label} is required` })}
+        {...register(name, { 
+          required: required && `${label} is required`,
+          ...validation
+        })}
         className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 ${
           errors[name] ? 'border-red-500' : 'border-gray-300'
         }`}
