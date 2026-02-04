@@ -143,7 +143,11 @@ exports.updateTask = async (req, res, next) => {
     // Update task
     Object.keys(req.body).forEach(key => {
       if (req.body[key] !== undefined) {
-        task[key] = req.body[key];
+        if (key === 'assignedTo' && req.body[key] === '') {
+          task[key] = null;
+        } else {
+          task[key] = req.body[key];
+        }
       }
     });
 

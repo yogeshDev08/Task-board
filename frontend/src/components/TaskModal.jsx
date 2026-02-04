@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { useDispatch, useSelector } from 'react-redux';
 import { createTask, updateTask } from '../store/tasksSlice';
+import { isAdmin } from '../utils/permissions';
+import { validateTaskTitle, validateTaskDescription, validateDueDate } from '../utils/validation';
 import FormInput from './FormInput';
 import SearchableUserSelect from './SearchableUserSelect';
 import LoadingSpinner from './LoadingSpinner';
@@ -11,6 +13,7 @@ const TaskModal = ({ task, isOpen, onClose }) => {
   const { loading } = useSelector((state) => state.tasks);
   const { user } = useSelector((state) => state.auth);
   const isEdit = !!task;
+  const isAdminUser = isAdmin(user);
 
   const {
     register,
@@ -26,7 +29,7 @@ const TaskModal = ({ task, isOpen, onClose }) => {
       status: 'TODO',
       priority: 'MEDIUM',
       dueDate: '',
-      assignedTo: ''
+      assignedTo: null
     },
     mode: 'onBlur'
   });
@@ -46,7 +49,7 @@ const TaskModal = ({ task, isOpen, onClose }) => {
     }
   }, [task, setValue, reset]);
 
-  const onSubmit = async (data) => {
+  const onSubmit = useCallback(async (data) => {
     try {
       if (isEdit) {
         await dispatch(updateTask({ taskId: task._id, taskData: data })).unwrap();
@@ -58,7 +61,7 @@ const TaskModal = ({ task, isOpen, onClose }) => {
     } catch (error) {
       console.error('Error saving task:', error);
     }
-  };
+  }, [isEdit, task?._id, dispatch, onClose, reset]);
 
   if (!isOpen) return null;
 
@@ -168,7 +171,7 @@ const TaskModal = ({ task, isOpen, onClose }) => {
             )}
           </div>
 
-          {user?.role === 'admin' && (
+          {isAdminUser && (
             <SearchableUserSelect
               value={assignedToValue}
               onChange={(value) => setValue('assignedTo', value)}

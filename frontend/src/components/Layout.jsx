@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import { Outlet, Link, useNavigate, useMatch } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { logout } from '../store/authSlice';
@@ -9,12 +9,14 @@ const Layout = () => {
 
   const { user } = useSelector((state) => state.auth);
 
-  const handleLogout = () => {
+  const handleLogout = useCallback(() => {
     dispatch(logout());
     navigate('/login');
-  };
+  }, [dispatch, navigate]);
 
-  const isActive = (path) => { return useMatch({ path, end: true }) !== null; };
+  const isActive = useCallback((path) => {
+    return useMatch({ path, end: true }) !== null;
+  }, [useMatch]);
 
   return (
     <div className="min-h-screen bg-gray-50">

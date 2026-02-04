@@ -36,29 +36,26 @@ const SearchableUserSelect = ({ value, onChange, label = 'Assign To' }) => {
     []
   );
 
-  // Handle search input change
-  const handleSearchChange = (e) => {
+  const handleSearchChange = useCallback((e) => {
     const query = e.target.value;
     setSearchTerm(query);
     debouncedSearch(query);
-  };
+  }, [debouncedSearch]);
 
-  // Handle user selection
-  const handleSelectUser = (user) => {
+  const handleSelectUser = useCallback((user) => {
     setSelectedUser(user);
     onChange(user._id);
     setSearchTerm('');
     setUsers([]);
     setIsOpen(false);
-  };
+  }, [onChange]);
 
-  // Handle clear selection
-  const handleClear = () => {
+  const handleClear = useCallback(() => {
     setSelectedUser(null);
     onChange('');
     setSearchTerm('');
     setUsers([]);
-  };
+  }, [onChange]);
 
   // Load selected user data if value is provided
   useEffect(() => {

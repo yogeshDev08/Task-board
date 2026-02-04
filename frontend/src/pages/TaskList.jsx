@@ -1,7 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchTasks, setFilters, deleteTask } from '../store/tasksSlice';
 import { debounce } from '../utils/debounce';
+import { canEditTask, canDeleteTask } from '../utils/permissions';
 import TaskCard from '../components/TaskCard';
 import TaskModal from '../components/TaskModal';
 import LoadingSpinner from '../components/LoadingSpinner';
@@ -39,22 +40,22 @@ const TaskList = () => {
     dispatch(setFilters({ search: value }));
   }, 500);
 
-  const handleSearchChange = (e) => {
+  const handleSearchChange = useCallback((e) => {
     const value = e.target.value;
     setSearchTerm(value);
     handleSearch(value);
-  };
+  }, []);
 
-  const handleFilterChange = (key, value) => {
+  const handleFilterChange = useCallback((key, value) => {
     dispatch(setFilters({ [key]: value }));
-  };
+  }, [dispatch]);
 
-  const handleEdit = (task) => {
+  const handleEdit = useCallback((task) => {
     setEditingTask(task);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleDelete = async (taskId) => {
+  const handleDelete = useCallback(async (taskId) => {
     if (window.confirm('Are you sure you want to delete this task?')) {
       try {
         await dispatch(deleteTask(taskId)).unwrap();
@@ -63,23 +64,23 @@ const TaskList = () => {
         toast.error(error || 'Failed to delete task');
       }
     }
-  };
+  }, [dispatch]);
 
-  const handleCreate = () => {
+  const handleCreate = useCallback(() => {
     setEditingTask(null);
     setIsModalOpen(true);
-  };
+  }, []);
 
-  const handleCloseModal = () => {
+  const handleCloseModal = useCallback(() => {
     setIsModalOpen(false);
     setEditingTask(null);
     loadTasks(); // Refresh list after modal closes
-  };
+  }, []);
 
-  const handleClearFilters = () => {
+  const handleClearFilters = useCallback(() => {
     setSearchTerm('');
     dispatch(setFilters({ search: '', status: '', priority: '', dueDate: '' }));
-  };
+  }, [dispatch]);
 
   const hasActiveFilters = () => {
     return (
@@ -90,22 +91,20 @@ const TaskList = () => {
     );
   };
 
-  const canEdit = (task) => {
-    if (isAdmin) return true;
-    return task.createdBy?._id === user?.id || task.assignedTo?._id === user?.id;
-  };
+  const canEdit = useCallback((task) => {
+    return canEditTask(task, user);
+  }, [user]);
 
-  const canDelete = (task) => {
-    if (isAdmin) return true;
-    return task.createdBy?._id === user?.id;
-  };
+  const canDelete = useCallback((task) => {
+    return canDeleteTask(task, user);
+  }, [user]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-6">
       <div className="max-w-7xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-900">Tasks</h1>
-          {(isAdmin || true) && (
+          {isAdmin && (
             <button
               onClick={handleCreate}
               className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -191,8 +190,8 @@ const TaskList = () => {
               <TaskCard
                 key={task._id}
                 task={task}
-                onEdit={() => handleEdit(task)}
-                onDelete={() => handleDelete(task._id)}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
                 canEdit={canEdit(task)}
                 canDelete={canDelete(task)}
               />

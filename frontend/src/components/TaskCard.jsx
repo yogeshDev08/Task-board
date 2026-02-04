@@ -1,32 +1,14 @@
-import React from 'react';
-import { format } from 'date-fns';
+import React, { useCallback } from 'react';
+import { formatDate, getStatusColor, getPriorityColor } from '../utils/formatting';
 
 const TaskCard = ({ task, onEdit, onDelete, canEdit, canDelete }) => {
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'TODO':
-        return 'bg-gray-100 text-gray-800';
-      case 'IN_PROGRESS':
-        return 'bg-blue-100 text-blue-800';
-      case 'DONE':
-        return 'bg-green-100 text-green-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const handleEditClick = useCallback(() => {
+    onEdit(task);
+  }, [onEdit, task]);
 
-  const getPriorityColor = (priority) => {
-    switch (priority) {
-      case 'LOW':
-        return 'bg-green-100 text-green-800';
-      case 'MEDIUM':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'HIGH':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
+  const handleDeleteClick = useCallback(() => {
+    onDelete(task._id);
+  }, [onDelete, task._id]);
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
@@ -35,7 +17,7 @@ const TaskCard = ({ task, onEdit, onDelete, canEdit, canDelete }) => {
         <div className="flex gap-2">
           {canEdit && (
             <button
-              onClick={() => onEdit(task)}
+              onClick={handleEditClick}
               className="text-blue-600 hover:text-blue-800 text-sm font-medium"
             >
               Edit
@@ -43,7 +25,7 @@ const TaskCard = ({ task, onEdit, onDelete, canEdit, canDelete }) => {
           )}
           {canDelete && (
             <button
-              onClick={() => onDelete(task._id)}
+              onClick={handleDeleteClick}
               className="text-red-600 hover:text-red-800 text-sm font-medium"
             >
               Delete
@@ -67,7 +49,7 @@ const TaskCard = ({ task, onEdit, onDelete, canEdit, canDelete }) => {
       
       <div className="text-xs text-gray-500 space-y-1">
         {task.dueDate && (
-          <p>Due: {format(new Date(task.dueDate), 'MMM dd, yyyy')}</p>
+          <p>Due: {formatDate(task.dueDate)}</p>
         )}
         {task.assignedTo && (
           <p>Assigned to: {task.assignedTo.email}</p>
