@@ -8,7 +8,8 @@ const { validateRegister, validateLogin } = require('../middlewares/validator');
 router.post('/register', validateRegister, authController.register);
 router.post('/login', validateLogin, authController.login);
 
-// Protected route
+// Protected routes
 router.get('/me', authenticate, authController.getMe);
+router.put('/me', authenticate, authController.updateProfile);
 
 module.exports = router;

@@ -1,7 +1,9 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { fetchTasks } from '../store/tasksSlice';
+import { formatStatus, getStatusColor, getPriorityColor } from '../utils/formatting';
+import { isAdmin as checkIsAdmin } from '../utils/permissions';
 import LoadingSpinner from '../components/LoadingSpinner';
 
 const Dashboard = () => {
@@ -9,6 +11,8 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   const { tasks, loading } = useSelector((state) => state.tasks);
+
+  const isAdminUser = checkIsAdmin(user);
 
   useEffect(() => {
     dispatch(fetchTasks({ page: 1, limit: 100 }));
@@ -68,6 +72,15 @@ const Dashboard = () => {
             <h2 className="text-xl font-bold text-gray-900">Quick Actions</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {isAdminUser && (
+              <button
+                onClick={() => navigate('/tasks')}
+                className="p-4 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-left"
+              >
+                <h3 className="font-semibold mb-1">+ Create Task</h3>
+                <p className="text-sm opacity-90">Create a new task for your team</p>
+              </button>
+            )}
             <button
               onClick={() => navigate('/tasks')}
               className="p-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-left"

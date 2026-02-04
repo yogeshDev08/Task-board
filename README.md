@@ -96,12 +96,14 @@ npm install
 
 3. Create `.env` file in backend directory:
 ```env
-MONGO_URI=mongodb://localhost:27017/taskmanager
-JWT_SECRET=your-secret-key-change-in-production
+MONGO_URI=mongodb+srv://admin:password@cluster0.wlp63lo.mongodb.net/?appName=Cluster0
+JWT_SECRET=tempararysecretkey
 JWT_EXPIRES_IN=1h
 PORT=5000
 NODE_ENV=development
 FRONTEND_URL=http://localhost:3000
+ADMIN_EMAIL=admin@test.com
+ADMIN_PASSWORD=adminPassword@123
 ```
 
 4. Start the backend server:
