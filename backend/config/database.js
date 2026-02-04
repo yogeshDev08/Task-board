@@ -21,12 +21,24 @@ const initializeDefaultAdmin = async () => {
   try {
     const User = require('../models/User');
 
+    const adminEmail = process.env.ADMIN_EMAIL;
+    const adminPassword = process.env.ADMIN_PASSWORD;
+
+    // Check if admin credentials are provided
+    if (!adminEmail || !adminPassword) {
+      console.warn('\n⚠️  WARNING: Admin credentials not found in .env file');
+      console.warn('Please add the following to your .env file:');
+      console.warn('  ADMIN_EMAIL=your_admin_email@example.com');
+      console.warn('  ADMIN_PASSWORD=your_secure_password\n');
+      return;
+    }
+
     const adminExists = await User.findOne({ role: 'admin' });
 
     if (!adminExists) {
       const defaultAdmin = await User.create({
-        email: 'admin@test.com',
-        password: 'adminPassword@123',
+        email: adminEmail,
+        password: adminPassword,
         role: 'admin'
       });
 
